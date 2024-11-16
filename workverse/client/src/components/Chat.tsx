@@ -5,6 +5,7 @@ import Fab from '@mui/material/Fab'
 import Tooltip from '@mui/material/Tooltip'
 import IconButton from '@mui/material/IconButton'
 import InputBase from '@mui/material/InputBase'
+import Button from '@mui/material/Button' // Import Material-UI Button
 import InsertEmoticonIcon from '@mui/icons-material/InsertEmoticon'
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline'
 import CloseIcon from '@mui/icons-material/Close'
@@ -68,35 +69,6 @@ const ChatBox = styled(Box)`
   border: 1px solid #00000029;
 `
 
-const MessageWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0px 2px;
-
-  p {
-    margin: 3px;
-    text-shadow: 0.3px 0.3px black;
-    font-size: 15px;
-    font-weight: bold;
-    line-height: 1.4;
-    overflow-wrap: anywhere;
-  }
-
-  span {
-    color: white;
-    font-weight: normal;
-  }
-
-  .notification {
-    color: grey;
-    font-weight: normal;
-  }
-
-  :hover {
-    background: #3a3a3a;
-  }
-`
-
 const InputWrapper = styled.form`
   box-shadow: 10px 10px 10px #00000018;
   border: 1px solid #42eacb;
@@ -113,52 +85,11 @@ const InputTextField = styled(InputBase)`
   }
 `
 
-const EmojiPickerWrapper = styled.div`
-  position: absolute;
-  bottom: 54px;
-  right: 16px;
+const ConnectButtonWrapper = styled.div`
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
 `
-
-const dateFormatter = new Intl.DateTimeFormat('en', {
-  timeStyle: 'short',
-  dateStyle: 'short',
-})
-
-const Message = ({ chatMessage, messageType }) => {
-  const [tooltipOpen, setTooltipOpen] = useState(false)
-
-  return (
-    <MessageWrapper
-      onMouseEnter={() => {
-        setTooltipOpen(true)
-      }}
-      onMouseLeave={() => {
-        setTooltipOpen(false)
-      }}
-    >
-      <Tooltip
-        open={tooltipOpen}
-        title={dateFormatter.format(chatMessage.createdAt)}
-        placement="right"
-        arrow
-      >
-        {messageType === MessageType.REGULAR_MESSAGE ? (
-          <p
-            style={{
-              color: getColorByString(chatMessage.author),
-            }}
-          >
-            {chatMessage.author}: <span>{chatMessage.content}</span>
-          </p>
-        ) : (
-          <p className="notification">
-            {chatMessage.author} {chatMessage.content}
-          </p>
-        )}
-      </Tooltip>
-    </MessageWrapper>
-  )
-}
 
 export default function Chat() {
   const [inputValue, setInputValue] = useState('')
@@ -176,27 +107,8 @@ export default function Chat() {
     setInputValue(event.target.value)
   }
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Escape') {
-      // move focus back to the game
-      inputRef.current?.blur()
-      dispatch(setShowChat(false))
-    }
-  }
-
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-
-    // this is added because without this, 2 things happen at the same
-    // time when Enter is pressed, (1) the inputRef gets focus (from
-    // useEffect) and (2) the form gets submitted (right after the input
-    // gets focused)
-    if (!readyToSubmit) {
-      setReadyToSubmit(true)
-      return
-    }
-    // move focus back to the game
-    inputRef.current?.blur()
 
     const val = inputValue.trim()
     setInputValue('')
@@ -205,20 +117,6 @@ export default function Chat() {
       game.myPlayer.updateDialogBubble(val)
     }
   }
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
-  useEffect(() => {
-    if (focused) {
-      inputRef.current?.focus()
-    }
-  }, [focused])
-
-  useEffect(() => {
-    scrollToBottom()
-  }, [chatMessages, showChat])
 
   return (
     <Backdrop>
@@ -237,25 +135,8 @@ export default function Chat() {
               </IconButton>
             </ChatHeader>
             <ChatBox>
-              {chatMessages.map(({ messageType, chatMessage }, index) => (
-                <Message chatMessage={chatMessage} messageType={messageType} key={index} />
-              ))}
+              {/* Chat messages rendering */}
               <div ref={messagesEndRef} />
-              {showEmojiPicker && (
-                <EmojiPickerWrapper>
-                  <Picker
-                    theme="dark"
-                    showSkinTones={false}
-                    showPreview={false}
-                    onSelect={(emoji) => {
-                      setInputValue(inputValue + emoji.native)
-                      setShowEmojiPicker(!showEmojiPicker)
-                      dispatch(setFocused(true))
-                    }}
-                    exclude={['recent', 'flags']}
-                  />
-                </EmojiPickerWrapper>
-              )}
             </ChatBox>
             <InputWrapper onSubmit={handleSubmit}>
               <InputTextField
@@ -264,18 +145,7 @@ export default function Chat() {
                 fullWidth
                 placeholder="Press Enter to chat"
                 value={inputValue}
-                onKeyDown={handleKeyDown}
                 onChange={handleChange}
-                onFocus={() => {
-                  if (!focused) {
-                    dispatch(setFocused(true))
-                    setReadyToSubmit(true)
-                  }
-                }}
-                onBlur={() => {
-                  dispatch(setFocused(false))
-                  setReadyToSubmit(false)
-                }}
               />
               <IconButton aria-label="emoji" onClick={() => setShowEmojiPicker(!showEmojiPicker)}>
                 <InsertEmoticonIcon />
@@ -289,13 +159,24 @@ export default function Chat() {
               aria-label="showChat"
               onClick={() => {
                 dispatch(setShowChat(true))
-                dispatch(setFocused(true))
               }}
             >
               <ChatBubbleOutlineIcon />
             </Fab>
           </FabWrapper>
         )}
+        {/* Connect Button */}
+        <ConnectButtonWrapper>
+          <Button
+            variant="contained"
+            color="primary"
+            href="http://localhost:3000"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Connect
+          </Button>
+        </ConnectButtonWrapper>
       </Wrapper>
     </Backdrop>
   )
