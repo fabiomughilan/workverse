@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    // your compiler options
+  },
+  "include": [
+    "vite.config.ts"
+  ],
+  "exclude": [
+    // any paths you want to exclude
+  ]
+}
