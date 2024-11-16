@@ -1,22 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import {usePrivy} from "@privy-io/react-auth";
+import './App.css';
+import { usePrivy } from "@privy-io/react-auth";
+import { useEffect } from 'react';
+
 function App() {
-  const {login,user} = usePrivy();
+  const { login, user } = usePrivy();
+
+  useEffect(() => {
+    if (user) {
+      // Navigate to the external URL
+      window.location.href = 'http://172.25.1.185:5173'; 
+    }
+  }, [user]);
 
   return (
     <>
       <div>
+        <h1>WorkVerse</h1>
       </div>
-      <h1>WorkVerse</h1>
-      <div className="card">
-        <button onClick={login}>Login with Privy</button>
-      </div>
-      
+      {!user && (
+        <div className="card">
+          <button onClick={login}>Login with Privy</button>
+        </div>
+      )}
     </>
-  )
+  );
 }
 
-export default App
+export default App;
