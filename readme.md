@@ -93,3 +93,5 @@ yarn && yarn dev
 This project is licensed under MIT.
 
 If you're using Workverse to power your virtual office or using our code in other projects, please consider [buy me a coffee](https://www.buymeacoffee.com/Workverse). Thank you :)
+<img width="259" height="171" alt="image" src="https://github.com/user-attachments/assets/89af8ce2-b743-4945-92f4-fe63e7df9a19" />
+
